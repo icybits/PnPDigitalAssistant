@@ -4,8 +4,9 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 /**
- * Our main class for our pen and paper digital assistant (AKA: PnPDA). Here we initialize the assistant and show
- * our main view. The PnPDA is a JavaFX Application, so we extend {@link Application} here.
+ * Our main class for our pen and paper digital assistant (AKA: PnPDA). Here we initialize the
+ * assistant and show our main view. The PnPDA is a JavaFX Application, so we extend {@link
+ * Application} here.
  *
  * @author Iceac Sarutobi
  */
