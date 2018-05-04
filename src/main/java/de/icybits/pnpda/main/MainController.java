@@ -1,5 +1,10 @@
 package de.icybits.pnpda.main;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
+import de.icybits.pnpda.view.CenterView;
+import de.icybits.pnpda.view.SideView;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
@@ -19,5 +24,23 @@ public class MainController {
   @FXML
   private TabPane sideView;
 
+  @MainBus
+  @Inject
+  private EventBus mainBus;
 
+
+  @FXML
+  private void initialize() {
+    this.mainBus.register(this);
+  }
+
+  @Subscribe
+  public void openCenterView(CenterView view) {
+
+  }
+
+  @Subscribe
+  public void openSideView(SideView view) {
+
+  }
 }
