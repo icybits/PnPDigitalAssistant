@@ -16,7 +16,6 @@ public class MainModule implements Module {
   @Override
   public void configure(Binder binder) {
     binder.bind(Main.class).toInstance(this.main);
-    binder.bind(EventBus.class).annotatedWith(MainBus.class).in(Singleton.class);
   }
 
 }
