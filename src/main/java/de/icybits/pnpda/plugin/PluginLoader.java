@@ -83,6 +83,14 @@ public class PluginLoader<T> {
     }
   }
 
+  public interface Result<T> {
+
+    List<T> getPlugins();
+
+    List<Exception> getExceptions();
+
+  }
+
   private static class JarCollector extends SimpleFileVisitor<Path> {
 
     private final List<File> destination;

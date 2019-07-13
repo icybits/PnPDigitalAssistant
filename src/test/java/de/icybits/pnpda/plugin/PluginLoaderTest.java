@@ -1,5 +1,6 @@
 package de.icybits.pnpda.plugin;
 
+import de.icybits.pnpda.plugin.PluginLoader.Result;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
