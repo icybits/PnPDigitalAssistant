@@ -5,7 +5,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.*;
@@ -13,56 +14,54 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.jar.JarFile;
 
-/**
- * Load plugin classes from jars under given URI/Path.
- * TODO add example to class description.
- *
- * @author Iceac Sarutobi
- */
-public class PluginLoader {
+public class PluginLoader<T> {
 
   private static final Logger log = LogManager.getLogger(PluginLoader.class);
   private static final String PLUGIN_CLASS = "Plugin-Class";
 
-  /**
-   * Load Plugins at given URI.
-   *
-   * @param source the uri to a jar or folder
-   * @return The {@link Result} containing the loaded Plugins and/or exceptions.
-   * @throws IOException Most likely if the given file or folder is not accessible.
-   */
-  public static Result load(URI source) throws IOException {
-    return load(Paths.get(source));
+  private Class<T> type;
+  private Path location;
+
+  public PluginLoader(Class<T> type) {
+    this.type = Objects.requireNonNull(type);
+    this.setLocation(Paths.get("plugins"));
   }
 
-  /**
-   * Load Plugins at given Path.
-   *
-   * @param source the uri to a jar or folder
-   * @return The {@link Result} containing the loaded Plugins and/or exceptions.
-   * @throws IOException Most likely if the given file or folder is not accessible.
-   */
-  public static Result load(Path source) throws IOException {
-    final List<Plugin> pluginList = new ArrayList<>();
+  public Path getLocation() {
+    return this.location;
+  }
+
+  public void setLocation(Path location) {
+    this.location = Objects.requireNonNull(location);
+  }
+
+  public Result<T> load() {
+    final List<T> pluginList = new ArrayList<>();
     final List<File> fileList = new ArrayList<>();
     final List<Exception> exceptionList = new ArrayList<>();
 
-    Files.walkFileTree(source, new JarCollector(fileList));
+    try {
+      Files.walkFileTree(this.getLocation(), new JarCollector(fileList));
+    } catch (IOException e) {
+      log.debug(e);
+      exceptionList.add(e);
+    }
 
     for (File file : fileList) {
       try {
-        pluginList.add(getPluginFromJarFile(file));
-      } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+        pluginList.add(this.getPluginFromJarFile(file));
+      } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
         log.debug(e);
         exceptionList.add(e);
       }
     }
 
-    return new Result() {
+    return new Result<>() {
       @Override
-      public List<Plugin> getPlugins() {
+      public List<T> getPlugins() {
         return Collections.unmodifiableList(pluginList);
       }
 
@@ -73,24 +72,15 @@ public class PluginLoader {
     };
   }
 
-  private static Plugin getPluginFromJarFile(File file) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-    JarFile jarFile = new JarFile(file);
-    String className = jarFile.getManifest().getMainAttributes().getValue(PLUGIN_CLASS);
-    URLClassLoader loader = new URLClassLoader(new URL[]{file.toURI().toURL()});
-    Class<?> pluginClass = loader.loadClass(className);
-    Class<? extends Plugin> plugin = pluginClass.asSubclass(Plugin.class);
-    return plugin.newInstance();
-  }
-
-  /**
-   * The Result of the PluginLoader load method. Contains the Plugins and/or Exceptions.
-   */
-  public interface Result {
-
-    List<Plugin> getPlugins();
-
-    List<Exception> getExceptions();
-
+  private T getPluginFromJarFile(File file) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+    try (JarFile jarFile = new JarFile(file)) {
+      String className = jarFile.getManifest().getMainAttributes().getValue(PLUGIN_CLASS);
+      URLClassLoader loader = new URLClassLoader(new URL[]{file.toURI().toURL()});
+      Class<?> pluginClass = loader.loadClass(className);
+      Class<? extends T> plugin = pluginClass.asSubclass(this.type);
+      Constructor<? extends T> constructor = plugin.getConstructor();
+      return constructor.newInstance();
+    }
   }
 
   private static class JarCollector extends SimpleFileVisitor<Path> {
@@ -108,7 +98,7 @@ public class PluginLoader {
         return FileVisitResult.CONTINUE;
       }
       File file = path.toFile();
-      if (!isJar(file)) {
+      if (!this.isJar(file)) {
         log.debug("non jar file in visitFile method: " + path);
         return FileVisitResult.CONTINUE;
       }

@@ -110,3 +110,7 @@ gradle-app.setting
 
 
 # End of https://www.gitignore.io/api/java,gradle,intellij+all
+
+# do not ignore test files
+!yes.jar
+!non.jar
