@@ -1,6 +1,5 @@
-package de.icybits.pnpda.plugin;
+package de.icybits.plugin.loader;
 
-import de.icybits.pnpda.plugin.PluginLoader.Result;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,8 @@ class PluginLoaderTest {
 
   @BeforeAll
   static void createTemporaryFolderStructure(@TempDir Path temporaryTestDirectory) throws URISyntaxException, IOException {
-    yesJarFile = Paths.get(PluginLoaderTest.class.getResource("/de/icybits/pnpda/plugin/yes.jar").toURI());
-    nonJarFile = Paths.get(PluginLoaderTest.class.getResource("/de/icybits/pnpda/plugin/non.jar").toURI());
+    yesJarFile = Paths.get(PluginLoaderTest.class.getResource("/de/icybits/plugin/loader/yes.jar").toURI());
+    nonJarFile = Paths.get(PluginLoaderTest.class.getResource("/de/icybits/plugin/loader/non.jar").toURI());
 
     Files.copy(yesJarFile, temporaryTestDirectory.resolve(yesJarFile.getFileName()));
     Files.copy(nonJarFile, temporaryTestDirectory.resolve(nonJarFile.getFileName()));
@@ -50,7 +49,7 @@ class PluginLoaderTest {
   @Test
   void hasExceptionIfPluginLocationFolderNotExist() {
     PluginLoader<Object> loader = new PluginLoader<>(Object.class);
-    Result<Object> result = loader.load();
+    PluginLoader.Result<Object> result = loader.load();
     Assertions.assertEquals(1, result.getExceptions().size());
   }
 
@@ -58,7 +57,7 @@ class PluginLoaderTest {
   void hasExceptionAndNoPluginIfNonJarIsLoaded() {
     PluginLoader<Object> loader = new PluginLoader<>(Object.class);
     loader.setLocation(nonJarFile);
-    Result<Object> result = loader.load();
+    PluginLoader.Result<Object> result = loader.load();
     Assertions.assertEquals(1, result.getExceptions().size());
     Assertions.assertEquals(0, result.getPlugins().size());
   }
@@ -67,7 +66,7 @@ class PluginLoaderTest {
   void hasPluginAndNoExceptionIfYesJarIsLoaded() {
     PluginLoader<Object> loader = new PluginLoader<>(Object.class);
     loader.setLocation(yesJarFile);
-    Result<Object> result = loader.load();
+    PluginLoader.Result<Object> result = loader.load();
     Assertions.assertEquals(0, result.getExceptions().size());
     Assertions.assertEquals(1, result.getPlugins().size());
     Assertions.assertTrue(result.getPlugins().get(0) instanceof TestPlugin);
@@ -77,7 +76,7 @@ class PluginLoaderTest {
   void hasPluginsAndExceptionsIfTestPluginFolderIsUsed() {
     PluginLoader<Object> loader = new PluginLoader<>(Object.class);
     loader.setLocation(temporaryTestDirectory);
-    Result<Object> result = loader.load();
+    PluginLoader.Result<Object> result = loader.load();
     Assertions.assertEquals(2, result.getPlugins().size());
     Assertions.assertTrue(result.getPlugins().get(0) instanceof TestPlugin);
     Assertions.assertTrue(result.getPlugins().get(1) instanceof TestPlugin);

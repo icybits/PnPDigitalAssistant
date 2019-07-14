@@ -1,4 +1,4 @@
-package de.icybits.pnpda.plugin;
+package de.icybits.plugin.loader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
