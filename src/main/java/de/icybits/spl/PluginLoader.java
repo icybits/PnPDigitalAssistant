@@ -1,4 +1,4 @@
-package de.icybits.plugin.loader;
+package de.icybits.spl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +17,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.jar.JarFile;
 
+/**
+ * This plugin loader works on a simple contract.
+ * Any type of jar/zip file which contains a manifest file,
+ * is valid if this manifest file contains a main attribute {@value PLUGIN_CLASS}
+ * and this main attribute value is the full class name of a class,
+ * which is of the Type {@link T} or extends this type.
+ * This class needs a parameter less constructor.
+ * The plugin loader then will create an instance of this class.
+ * Any possible exception will be collected and can be accessed by the Result.
+ *
+ * @param <T> the type of the plugin class which needs to be instantiated.
+ */
 public class PluginLoader<T> {
 
   private static final Logger log = LogManager.getLogger(PluginLoader.class);

@@ -1,4 +1,4 @@
-package de.icybits.plugin.loader;
+package de.icybits.spl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,8 +22,8 @@ class PluginLoaderTest {
 
   @BeforeAll
   static void createTemporaryFolderStructure(@TempDir Path temporaryTestDirectory) throws URISyntaxException, IOException {
-    yesJarFile = Paths.get(PluginLoaderTest.class.getResource("/de/icybits/plugin/loader/yes.jar").toURI());
-    nonJarFile = Paths.get(PluginLoaderTest.class.getResource("/de/icybits/plugin/loader/non.jar").toURI());
+    yesJarFile = Paths.get(PluginLoaderTest.class.getResource("/de/icybits/spl/yes.jar").toURI());
+    nonJarFile = Paths.get(PluginLoaderTest.class.getResource("/de/icybits/spl/non.jar").toURI());
 
     Files.copy(yesJarFile, temporaryTestDirectory.resolve(yesJarFile.getFileName()));
     Files.copy(nonJarFile, temporaryTestDirectory.resolve(nonJarFile.getFileName()));
