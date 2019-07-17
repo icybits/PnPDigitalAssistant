@@ -113,4 +113,5 @@ gradle-app.setting
 
 # do not ignore test files
 !yes.jar
+!yes.zip
 !non.jar

@@ -86,6 +86,12 @@ public class PluginLoader<T> {
 
   private T getPluginFromJarFile(File file) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
     try (JarFile jarFile = new JarFile(file)) {
+      if (jarFile.getManifest() == null) {
+        throw new IOException("No Manifest");
+      }
+      if (jarFile.getManifest().getMainAttributes().getValue(PLUGIN_CLASS) == null) {
+        throw new IOException("No main attribute: " + PLUGIN_CLASS);
+      }
       String className = jarFile.getManifest().getMainAttributes().getValue(PLUGIN_CLASS);
       URLClassLoader loader = new URLClassLoader(new URL[]{file.toURI().toURL()});
       Class<?> pluginClass = loader.loadClass(className);
